@@ -10,8 +10,10 @@ import logging
 import os
 import tempfile
 from pathlib import Path
+from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 from scipy.spatial import KDTree
 
 logger = logging.getLogger("inksep")
@@ -52,7 +54,9 @@ from matplotlib.patches import PathPatch, Rectangle  # noqa: E402
 _KAPPA = 0.5522847498307936
 
 
-def _circles_path(x: np.ndarray, y: np.ndarray, r: np.ndarray) -> mpath.Path:
+def _circles_path(
+    x: NDArray[np.float64], y: NDArray[np.float64], r: NDArray[np.floating[Any]]
+) -> mpath.Path:
     """One compound Bézier path with a circle per dot.
 
     A single vectorised path instead of thousands of individual patches is
@@ -90,7 +94,7 @@ class PreviewWindow:
 
     def __init__(
         self,
-        brightness: np.ndarray,
+        brightness: NDArray[np.float32],
         n_stipples: int,
         generations: int,
         invert: bool,
@@ -368,7 +372,9 @@ class PreviewWindow:
         self.generations = generations
         self._spark_ax.set_xlim(0, max(generations, 1))
 
-    def _count_overlaps(self, particles: np.ndarray, radii: np.ndarray) -> int:
+    def _count_overlaps(
+        self, particles: NDArray[np.float64], radii: NDArray[np.floating[Any]]
+    ) -> int:
         """Fast overlap count for live display."""
         if len(particles) < 2:
             return 0
@@ -382,7 +388,7 @@ class PreviewWindow:
 
     def update(
         self,
-        particles: np.ndarray,
+        particles: NDArray[np.float64],
         gen: int,
         elapsed: float,
         gen_time: float,

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import TypedDict, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -247,9 +247,9 @@ def compute_separation_report(
 
     tree = KDTree(particles)
     dists, _ = tree.query(particles, k=2)
-    nn_px = dists[:, 1]
+    nn_px = cast("NDArray[np.float64]", dists)[:, 1]
     nn_mm = nn_px / px_per_mm
-    global_min = nn_mm.min()
+    global_min = np.min(nn_mm)
     max_dot_mm = max_dot / px_per_mm
 
     # Two dots overlap when their centres are closer than r_i + r_j; the
@@ -269,7 +269,7 @@ def compute_separation_report(
         if n_overlap_pairs > 0:
             touched = np.concatenate((ii[ov_mask], jj[ov_mask]))
             n_overlap = int(np.unique(touched).size)
-            max_depth = float((req - pd)[ov_mask].max()) / px_per_mm
+            max_depth = float(np.max((req - pd)[ov_mask])) / px_per_mm
 
     # Darkest 10% nearest-neighbour
     thresh10 = np.percentile(v, 10)
@@ -277,19 +277,19 @@ def compute_separation_report(
     dark_pts = particles[dark_mask]
     dark_tree = KDTree(dark_pts)
     dark_d, _ = dark_tree.query(dark_pts, k=2)
-    dark_nn_mm = dark_d[:, 1] / px_per_mm
+    dark_nn_mm = cast("NDArray[np.float64]", dark_d)[:, 1] / px_per_mm
 
     return SeparationReport(
         global_min_mm=float(global_min),
-        global_mean_mm=float(nn_mm.mean()),
+        global_mean_mm=float(np.mean(nn_mm)),
         max_dot_mm=float(max_dot_mm),
         ratio=float(global_min / max_dot_mm),
         n_overlap=n_overlap,
         n_overlap_pairs=n_overlap_pairs,
         pct_overlap=n_overlap / N * 100,
         max_depth_mm=max_depth,
-        dark_mean_mm=float(dark_nn_mm.mean()),
-        dark_min_mm=float(dark_nn_mm.min()),
+        dark_mean_mm=float(np.mean(dark_nn_mm)),
+        dark_min_mm=float(np.min(dark_nn_mm)),
         n_dots=N,
     )
 
