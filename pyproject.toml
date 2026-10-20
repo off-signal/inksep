@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "inksep"
+dynamic = ["version"]
+description = "Separation-constrained weighted Voronoi stippling: image to stippled SVG"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "inksep contributors" }]
+keywords = ["stippling", "voronoi", "pen-plotter", "svg", "halftone", "generative-art"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Multimedia :: Graphics",
+]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "Pillow>=9.0",
+    "matplotlib>=3.7",
+]
+
+[project.scripts]
+inksep = "inksep.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/off-signal/inksep"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4",
+    "ruff>=0.4",
+    "mypy>=1.8",
+    "pytest-cov>=7.1.0",
+    "scipy-stubs>=1.15.3.0",
+]
+
+[tool.hatch.version]
+path = "src/inksep/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/inksep"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/inksep", "tests", "README.md", "LICENSE", "pyproject.toml"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_unreachable = true
+pretty = true
+files = ["src/inksep"]
+
+[[tool.mypy.overrides]]
+module = ["matplotlib", "matplotlib.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
